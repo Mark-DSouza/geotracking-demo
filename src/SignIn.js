@@ -132,6 +132,8 @@ export default function SignIn() {
       case 'password':
         setPassword(value);
         break;
+      default: 
+        console.err("handleChange() couldn't match event with value.");
     }
   }
   return (
