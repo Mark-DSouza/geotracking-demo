@@ -61,66 +61,93 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
-  const [userAddress, setUserAddress] = useState("");
+  const [userRegion, setUserRegion] = useState("");         // State in USA
+  const [userRegionCode, setUserRegionCode] = useState(""); // Abbr. name of State
   const [hasGeolocation, setHasGeolocation] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   
   // Dummy variables
   // const [isSignedIn, setIsSignedIn] = useState(false);
 
+  // useEffect(() => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(getCoordinates, handleLocationError);
+  //   }
+  //   else {
+  //     alert("Geolocation is not supported by this browser.");
+  //   }
+  // });
+
+  // function getCoordinates(position) {
+  //   setHasGeolocation(true);
+  //   const lat = position.coords.latitude;
+  //   const lon = position.coords.longitude;
+  //   setLatitude(lat);
+  //   setLongitude(lon);
+  //   reverseGeocodeCoordinates(lat, lon);
+  // }
+
+  // function reverseGeocodeCoordinates(lat, lon) {
+  //   // fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyC7LmwxhGW-LIDMZQxn2Isj-x0kNpTNb_A`)
+  //   fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${API_KEY}`)
+  //     .then(response => response.json())
+  //     // .then(data => console.log(data))
+  //     // .then(data => this.setState({userAddress: data.results[data.results.length-1].formatted_address}))
+  //     .then(data => setUserAddress(data.results[data.results.length-1].formatted_address))
+  //     .catch(error => alert(error))
+  // }
+
+  // function handleLocationError(error) {
+  //   setHasGeolocation(false);
+  //   switch(error.code) {
+  //     case error.PERMISSION_DENIED:
+  //       setErrorMessage("You denied the request for Geolocation.");
+  //       console.log("User denied the request for Geolocation.");
+  //       break;
+  //     case error.POSITION_UNAVAILABLE:
+  //       setErrorMessage("Location information is unavailable.");
+  //       console.log("Location information is unavailable.");
+  //       break;
+  //     case error.TIMEOUT:
+  //       setErrorMessage("The request to get user location timed out.");
+  //       console.log("The request to get user location timed out.");
+  //       break;
+  //     case error.UNKNOWN_ERROR:
+  //       setErrorMessage("An unknown error occurred.");
+  //       console.log("An unknown error occurred.");
+  //       break;
+  //     default:
+  //       setErrorMessage("An unknown error occurred(default case).");
+  //       console.log("An unknown error occurred(default case).");
+  //       break;
+  //   }
+  // }
+
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(getCoordinates, handleLocationError);
-    }
-    else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  });
-
-  function getCoordinates(position) {
-    setHasGeolocation(true);
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    setLatitude(lat);
-    setLongitude(lon);
-    reverseGeocodeCoordinates(lat, lon);
-  }
-
-  function reverseGeocodeCoordinates(lat, lon) {
-    // fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyC7LmwxhGW-LIDMZQxn2Isj-x0kNpTNb_A`)
-    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${API_KEY}`)
-      .then(response => response.json())
-      // .then(data => console.log(data))
-      // .then(data => this.setState({userAddress: data.results[data.results.length-1].formatted_address}))
-      .then(data => setUserAddress(data.results[data.results.length-1].formatted_address))
-      .catch(error => alert(error))
-  }
-
-  function handleLocationError(error) {
-    setHasGeolocation(false);
-    switch(error.code) {
-      case error.PERMISSION_DENIED:
-        setErrorMessage("You denied the request for Geolocation.");
-        console.log("User denied the request for Geolocation.");
-        break;
-      case error.POSITION_UNAVAILABLE:
-        setErrorMessage("Location information is unavailable.");
-        console.log("Location information is unavailable.");
-        break;
-      case error.TIMEOUT:
-        setErrorMessage("The request to get user location timed out.");
-        console.log("The request to get user location timed out.");
-        break;
-      case error.UNKNOWN_ERROR:
-        setErrorMessage("An unknown error occurred.");
-        console.log("An unknown error occurred.");
-        break;
-      default:
-        setErrorMessage("An unknown error occurred(default case).");
-        console.log("An unknown error occurred(default case).");
-        break;
-    }
-  }
+    var request = new XMLHttpRequest();
+    request.open('GET', `https://api.ipdata.co/?api-key=${API_KEY}`);
+    request.setRequestHeader('Accept', 'application/json');
+    request.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          setHasGeolocation(true);
+          const data = JSON.parse(this.responseText);
+          setLatitude(data.latitude);
+          setLongitude(data.longitude);
+          setUserRegion(data.region);
+          setUserRegionCode(data.region_code);
+          console.log(`lat: ${data.latitude} long: ${data.longitude}`);
+          console.log(data);
+        }
+        else {
+          setHasGeolocation(false);
+          console.error(`Status code: ${this.status.code}; Status text: ${this.statusText}`);
+          setErrorMessage("Something went wrong, please retry");
+        }
+      }
+    };
+    request.send();
+  }, []);
 
   function handleChange(event) {
     console.log(hasGeolocation, email, password)
@@ -133,7 +160,7 @@ export default function SignIn() {
         setPassword(value);
         break;
       default: 
-        console.err("handleChange() couldn't match event with value.");
+        console.error("handleChange() couldn't match event with value.");
     }
   }
   return (
@@ -164,7 +191,7 @@ export default function SignIn() {
             // disabled={true}
             // error={true}
             // value={email}
-            value={hasGeolocation ? email : " "}
+            value={email}
             onChange={handleChange}
           />
           <TextField
@@ -181,7 +208,7 @@ export default function SignIn() {
             disabled={!hasGeolocation}
             error={!hasGeolocation}
             helperText={errorMessage}
-            value={hasGeolocation ? password : " "}
+            value={password}
             onChange={handleChange}
           />
           <FormControlLabel
@@ -223,7 +250,8 @@ export default function SignIn() {
         <p>Longitude: {longitude}</p>
         <br />
         <h4>Google Maps Reverse Geocoding</h4>
-        <p>Address: {userAddress}</p>
+        <p>Region: {userRegion}</p>
+        <p>Region Code: {userRegionCode}</p>
         
       </div>
       <Box mt={8}>
