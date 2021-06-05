@@ -55,15 +55,19 @@ function App(props) {
 
   return (
     <SignIn
-        latitude={latitude}
-        longitude={longitude}
-        email={email}
-        password={password}
-        userRegion={userRegion}
-        userRegionCode={userRegionCode}
-        errorMessage={errorMessage}
-        handleChange={handleChange}
-        hasGeolocation={hasGeolocation}
+        args = {
+                    {
+                        latitude,
+                        longitude,
+                        email,
+                        password,
+                        userRegion,
+                        userRegionCode,
+                        errorMessage,
+                        handleChange,
+                        hasGeolocation
+                    }
+                }
     />
   )
 }

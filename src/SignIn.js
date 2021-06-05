@@ -53,19 +53,46 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function SignIn(props) 
+export default function SignIn(
+  {
+    args: 
+      {
+        latitude,
+        longitude,
+        email,
+        password,
+        userRegion,
+        userRegionCode,
+        errorMessage,
+        handleChange,
+        hasGeolocation,
+      }
+  }
+) 
 {
-  const {
-    latitude,
-    longitude,
-    email,
-    password,
-    userRegion,
-    userRegionCode,
-    errorMessage,
-    handleChange,
-    hasGeolocation,
-  } = props;
+  // const {
+  //   latitude,
+  //   longitude,
+  //   email,
+  //   password,
+  //   userRegion,
+  //   userRegionCode,
+  //   errorMessage,
+  //   handleChange,
+  //   hasGeolocation,
+  // } = props.args;
+
+  // const {
+  //   latitude,
+  //   longitude,
+  //   email,
+  //   password,
+  //   userRegion,
+  //   userRegionCode,
+  //   errorMessage,
+  //   handleChange,
+  //   hasGeolocation,
+  // } = props;
   
   const classes = useStyles();
 
