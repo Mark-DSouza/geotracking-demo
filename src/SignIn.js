@@ -97,29 +97,40 @@ export default function SignIn() {
   }
 
   function handleLocationError(error) {
-    setHasGeolocation(false);
-    switch(error.code) {
-      case error.PERMISSION_DENIED:
-        setErrorMessage("You denied the request for Geolocation.");
-        console.log("User denied the request for Geolocation.");
-        break;
-      case error.POSITION_UNAVAILABLE:
-        setErrorMessage("Location information is unavailable.");
-        console.log("Location information is unavailable.");
-        break;
-      case error.TIMEOUT:
-        setErrorMessage("The request to get user location timed out.");
-        console.log("The request to get user location timed out.");
-        break;
-      case error.UNKNOWN_ERROR:
-        setErrorMessage("An unknown error occurred.");
-        console.log("An unknown error occurred.");
-        break;
-      default:
-        setErrorMessage("An unknown error occurred(default case).");
-        console.log("An unknown error occurred(default case).");
-        break;
-    }
+    var request = new XMLHttpRequest();
+    request.open('GET', 'https://api.ipdata.co/?api-key=10669d7f4c2ba008dda9bdc2b5f87a1a1227c251d86389f0445ebcf9');
+    request.setRequestHeader('Accept', 'application/json');
+    request.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        const data = JSON.parse(this.responseText)
+        console.log(`lat: ${data.latitude} long: ${data.longitude}`);
+        console.log(data);
+      }
+    };
+    request.send();
+    // setHasGeolocation(false);
+    // switch(error.code) {
+    //   case error.PERMISSION_DENIED:
+    //     setErrorMessage("You denied the request for Geolocation.");
+    //     console.log("User denied the request for Geolocation.");
+    //     break;
+    //   case error.POSITION_UNAVAILABLE:
+    //     setErrorMessage("Location information is unavailable.");
+    //     console.log("Location information is unavailable.");
+    //     break;
+    //   case error.TIMEOUT:
+    //     setErrorMessage("The request to get user location timed out.");
+    //     console.log("The request to get user location timed out.");
+    //     break;
+    //   case error.UNKNOWN_ERROR:
+    //     setErrorMessage("An unknown error occurred.");
+    //     console.log("An unknown error occurred.");
+    //     break;
+    //   default:
+    //     setErrorMessage("An unknown error occurred(default case).");
+    //     console.log("An unknown error occurred(default case).");
+    //     break;
+    // }
   }
 
   function handleChange(event) {
