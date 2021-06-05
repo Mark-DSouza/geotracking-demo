@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from 'react';
-import {API_KEY} from './.config.js';
+import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -54,115 +53,22 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function SignIn() {
+export default function SignIn(props) 
+{
+  const {
+    latitude,
+    longitude,
+    email,
+    password,
+    userRegion,
+    userRegionCode,
+    errorMessage,
+    handleChange,
+    hasGeolocation,
+  } = props;
+  
   const classes = useStyles();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
-  const [userRegion, setUserRegion] = useState("");         // State in USA
-  const [userRegionCode, setUserRegionCode] = useState(""); // Abbr. name of State
-  const [hasGeolocation, setHasGeolocation] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  
-  // Dummy variables
-  // const [isSignedIn, setIsSignedIn] = useState(false);
-
-  // useEffect(() => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(getCoordinates, handleLocationError);
-  //   }
-  //   else {
-  //     alert("Geolocation is not supported by this browser.");
-  //   }
-  // });
-
-  // function getCoordinates(position) {
-  //   setHasGeolocation(true);
-  //   const lat = position.coords.latitude;
-  //   const lon = position.coords.longitude;
-  //   setLatitude(lat);
-  //   setLongitude(lon);
-  //   reverseGeocodeCoordinates(lat, lon);
-  // }
-
-  // function reverseGeocodeCoordinates(lat, lon) {
-  //   // fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyC7LmwxhGW-LIDMZQxn2Isj-x0kNpTNb_A`)
-  //   fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${API_KEY}`)
-  //     .then(response => response.json())
-  //     // .then(data => console.log(data))
-  //     // .then(data => this.setState({userAddress: data.results[data.results.length-1].formatted_address}))
-  //     .then(data => setUserAddress(data.results[data.results.length-1].formatted_address))
-  //     .catch(error => alert(error))
-  // }
-
-  // function handleLocationError(error) {
-  //   setHasGeolocation(false);
-  //   switch(error.code) {
-  //     case error.PERMISSION_DENIED:
-  //       setErrorMessage("You denied the request for Geolocation.");
-  //       console.log("User denied the request for Geolocation.");
-  //       break;
-  //     case error.POSITION_UNAVAILABLE:
-  //       setErrorMessage("Location information is unavailable.");
-  //       console.log("Location information is unavailable.");
-  //       break;
-  //     case error.TIMEOUT:
-  //       setErrorMessage("The request to get user location timed out.");
-  //       console.log("The request to get user location timed out.");
-  //       break;
-  //     case error.UNKNOWN_ERROR:
-  //       setErrorMessage("An unknown error occurred.");
-  //       console.log("An unknown error occurred.");
-  //       break;
-  //     default:
-  //       setErrorMessage("An unknown error occurred(default case).");
-  //       console.log("An unknown error occurred(default case).");
-  //       break;
-  //   }
-  // }
-
-  useEffect(() => {
-    var request = new XMLHttpRequest();
-    request.open('GET', `https://api.ipdata.co/?api-key=${API_KEY}`);
-    request.setRequestHeader('Accept', 'application/json');
-    request.onreadystatechange = function () {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          setHasGeolocation(true);
-          const data = JSON.parse(this.responseText);
-          setLatitude(data.latitude);
-          setLongitude(data.longitude);
-          setUserRegion(data.region);
-          setUserRegionCode(data.region_code);
-          console.log(`lat: ${data.latitude} long: ${data.longitude}`);
-          console.log(data);
-        }
-        else {
-          setHasGeolocation(false);
-          console.error(`Status code: ${this.status.code}; Status text: ${this.statusText}`);
-          setErrorMessage("Something went wrong, please retry");
-        }
-      }
-    };
-    request.send();
-  }, []);
-
-  function handleChange(event) {
-    console.log(hasGeolocation, email, password)
-    const {name, value} = event.target;
-    switch(name) {
-      case 'email':
-        setEmail(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      default: 
-        console.error("handleChange() couldn't match event with value.");
-    }
-  }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -188,9 +94,6 @@ export default function SignIn() {
             disabled={!hasGeolocation}
             error={!hasGeolocation}
             helperText={errorMessage}
-            // disabled={true}
-            // error={true}
-            // value={email}
             value={email}
             onChange={handleChange}
           />

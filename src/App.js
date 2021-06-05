@@ -1,90 +1,71 @@
-// import React from 'react';
-// import SignIn from './SignIn';
-// // import TextField from '@material-ui/core/TextField';
+import React, {useState, useEffect} from 'react'
+import {API_KEY} from './.config.js';
+import SignIn from './SignIn';
 
-// class App extends React.Component {
-//   constructor(props) {
-//     super(props)
-  
-//     this.state = {
-//        latitude: null,
-//        longitude: null,
-//        userAddress: null
-//     }
+function App(props) {
+    const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [userRegion, setUserRegion] = useState("");         // State in USA
+  const [userRegionCode, setUserRegionCode] = useState(""); // Abbr. name of State
+  const [hasGeolocation, setHasGeolocation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-//     this.getLocation = this.getLocation.bind(this);
-//     this.getCoordinates = this.getCoordinates.bind(this);
-//     this.reverseGeocodeCoordinates = this.reverseGeocodeCoordinates.bind(this);
-//   }
+  useEffect(() => {
+    var request = new XMLHttpRequest();
+    request.open('GET', `https://api.ipdata.co/?api-key=${API_KEY}`);
+    request.setRequestHeader('Accept', 'application/json');
+    request.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          setHasGeolocation(true);
+          const data = JSON.parse(this.responseText);
+          setLatitude(data.latitude);
+          setLongitude(data.longitude);
+          setUserRegion(data.region);
+          setUserRegionCode(data.region_code);
+          console.log(`lat: ${data.latitude} long: ${data.longitude}`);
+          console.log(data);
+        }
+        else {
+          setHasGeolocation(false);
+          console.error(`Status code: ${this.status.code}; Status text: ${this.statusText}`);
+          setErrorMessage("Something went wrong, please retry");
+        }
+      }
+    };
+    request.send();
+  }, []);
 
-//   getLocation() {
-//     if (navigator.geolocation) {
-//       navigator.geolocation.getCurrentPosition(this.getCoordinates, this.handleLocationError);
+  function handleChange(event) {
+    console.log(hasGeolocation, email, password)
+    const {name, value} = event.target;
+    switch(name) {
+      case 'email':
+        setEmail(value);
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+      default: 
+        console.error("handleChange() couldn't match event with value.");
+    }
+  }
 
-//     } else {
-//       alert("Geolocation is not supported by this browser.");
-//     }
-//   }
+  return (
+    <SignIn
+        latitude={latitude}
+        longitude={longitude}
+        email={email}
+        password={password}
+        userRegion={userRegion}
+        userRegionCode={userRegionCode}
+        errorMessage={errorMessage}
+        handleChange={handleChange}
+        hasGeolocation={hasGeolocation}
+    />
+  )
+}
 
-//   getCoordinates(position) {
-//     // console.log(position);
-//     this.setState({
-//       latitude: position.coords.latitude,
-//       longitude: position.coords.longitude,
-//     });
-//     this.reverseGeocodeCoordinates();
-//   }
-
-//   reverseGeocodeCoordinates() {
-//     fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=40.714224,-73.961452&key=AIzaSyC7LmwxhGW-LIDMZQxn2Isj-x0kNpTNb_A')
-//       .then(response => response.json())
-//       // .then(data => console.log(data))
-//       .then(data => this.setState({userAddress: data.results[data.results.length-1].formatted_address}))
-//       .catch(error => alert(error))
-//   }
-
-//   handleLocationError(error) {
-//     switch(error.code) {
-//       case error.PERMISSION_DENIED:
-//         alert("User denied the request for Geolocation.");
-//         break;
-//       case error.POSITION_UNAVAILABLE:
-//         alert("Location information is unavailable.");
-//         break;
-//       case error.TIMEOUT:
-//         alert("The request to get user location timed out.");
-//         break;
-//       case error.UNKNOWN_ERROR:
-//         alert("An unknown error occurred.");
-//         break;
-
-//       default:
-//         alert("An unknown error occurred.(default)");
-//         break;
-//     }
-//   }
-
-//   render() {
-//     return (
-//       <div>
-//         <h2>
-//           React Geolocation Example
-//         </h2>
-//         <button onClick={this.getLocation}>Get Coordinates</button>
-//         <h4>HTML5 Coordinates</h4>
-//         <p>Latitude: {this.state.latitude}</p>
-//         <p>Longitude: {this.state.longitude}</p>
-//         <h4>Google Maps Reverse Geocoding</h4>
-//         <p>Address: {this.state.userAddress}</p>
-        
-//       </div>
-//     )
-//   }
-  
-//   // <img src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.state.latitude},${this.state.longitude}&zoom=12&size=400x400&key=YOUR_API_KEY`} alt="" />}
-
-  
-// }
-
-
-// export default SignIn;
+export default App;
